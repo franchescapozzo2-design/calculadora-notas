@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Nota Final - The Board (v2)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================================= */
+        /* === 1. ESTILOS CSS (styles.css) === */
+        /* ================================================= */
+
+        /* Base y Reset */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #004c8f; /* Azul del logo */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Secciones de Evaluación Continua (EC) */
+        .ec-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .ec-title {
+            color: #004c8f;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .weight-tag {
+            background-color: #e0e0e0;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: normal;
+        }
+
+        /* Grid de Actividades */
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .activity-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .activity-input input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .activity-input input[type="number"]:focus {
+            border-color: #004c8f;
+            outline: none;
+        }
+
+        .ec-result {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding-top: 10px;
+            border-top: 1px dashed #e0e0e0;
+        }
+
+        .note-value {
+            color: #e67e22;
+        }
+
+        /* Sección de Resultado Final */
+        .final-result-section {
+            background-color: #d1e7f0;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Sección de Análisis y Brecha */
+        .analysis-section {
+            background-color: #ffffff;
+            border: 2px solid #004c8f;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .analysis-title {
+            color: #004c8f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analysis-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .gap-value-aprobado {
+            color: #27ae60; /* Verde */
+            font-size: 1.5em;
+        }
+        
+        .gap-value-desaprobado {
+            color: #c0392b; /* Rojo */
+            font-size: 1.5em;
+        }
+
+        .final-result-section h2 {
+            color: #004c8f;
+            margin-top: 0;
+        }
+
+        .final-grade-value {
+            font-size: 3em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        /* Mensajes de Estado */
+        .status-message {
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .status-aprobado {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-desaprobado {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        /* Media Query para Responsividad */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                margin: 15px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="the_board_peru_logo.jpeg" alt="Logo The Board" class="logo">
+            <h1>Calculadora de Nota Final</h1>
+        </div>
+        <p class="subtitle">Sistema Vigesimal (0 - 20)</p>
+    </header>
+
+    <main class="container">
+        
+        <section class="ec-section" data-ec-weight="0.20">
+            <h2 class="ec-title">EC1 <span class="weight-tag">(20%)</span></h2>
+            <div class="activities-grid" data-ec-id="ec1">
+                <div class="activity-input">
+                    <label for="ec1-foro">Foro (10%)</label>
+                    <input type="number" id="ec1-foro" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec1-participacion">Participación (20%)</label>
+                    <input type="number" id="ec1-participacion" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec1-cuestionario">Cuestionario (20%)</label>
+                    <input type="number" id="ec1-cuestionario" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec1-evidencia">Evidencia Evaluativa (50%)</label>
+                    <input type="number" id="ec1-evidencia" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+            </div>
+            <div class="ec-result">
+                <p>Nota EC1: <span id="ec1-note" class="note-value">0.00</span></p>
+            </div>
+        </section>
+
+        <section class="ec-section" data-ec-weight="0.35">
+            <h2 class="ec-title">EC2 <span class="weight-tag">(35%)</span></h2>
+            <div class="activities-grid" data-ec-id="ec2">
+                 <div class="activity-input">
+                    <label for="ec2-foro">Foro (10%)</label>
+                    <input type="number" id="ec2-foro" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec2-participacion">Participación (20%)</label>
+                    <input type="number" id="ec2-participacion" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec2-cuestionario">Cuestionario (20%)</label>
+                    <input type="number" id="ec2-cuestionario" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec2-evidencia">Evidencia Evaluativa (50%)</label>
+                    <input type="number" id="ec2-evidencia" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+            </div>
+            <div class="ec-result">
+                <p>Nota EC2: <span id="ec2-note" class="note-value">0.00</span></p>
+            </div>
+        </section>
+
+        <section class="ec-section" data-ec-weight="0.45">
+            <h2 class="ec-title">EC3 <span class="weight-tag">(45%)</span></h2>
+            <div class="activities-grid" data-ec-id="ec3">
+                 <div class="activity-input">
+                    <label for="ec3-foro">Foro (10%)</label>
+                    <input type="number" id="ec3-foro" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec3-participacion">Participación (20%)</label>
+                    <input type="number" id="ec3-participacion" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec3-cuestionario">Cuestionario (20%)</label>
+                    <input type="number" id="ec3-cuestionario" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+                <div class="activity-input">
+                    <label for="ec3-evidencia">Evidencia Evaluativa (50%)</label>
+                    <input type="number" id="ec3-evidencia" min="0" max="20" value="0" oninput="calculateFinalGrade()">
+                </div>
+            </div>
+            <div class="ec-result">
+                <p>Nota EC3: <span id="ec3-note" class="note-value">0.00</span></p>
+            </div>
+        </section>
+
+        <section class="final-result-section">
+            <h2>Nota Final del Curso:</h2>
+            <p id="final-grade-display" class="final-grade-value">0.00</p>
+            <p id="pass-status" class="status-message"></p>
+        </section>
+
+        <section class="analysis-section">
+            <h3 class="analysis-title">📊 Análisis de la Brecha (Meta: 13)</h3>
+            <p class="analysis-text" id="analysis-text"></p>
+        </section>
+
+    </main>
+
+    <script>
+        /* ================================================= */
+        /* === 2. LÓGICA JAVASCRIPT (script.js) - ACTUALIZADA === */
+        /* ================================================= */
+
+        const ACTIVITY_WEIGHTS = {
+            foro: 0.10,
+            participacion: 0.20,
+            cuestionario: 0.20,
+            evidencia: 0.50
+        };
+
+        const EC_WEIGHTS = {
+            ec1: 0.20,
+            ec2: 0.35,
+            ec3: 0.45
+        };
+
+        const PASSING_GRADE = 13; // Nueva nota mínima aprobatoria
+
+        /**
+         * Calcula la nota de una Evaluación Continua (EC) con validación 0-20.
+         */
+        function calculateECNote(ecId) {
+            let ecNote = 0;
+            let totalWeight = 0;
+
+            for (const activity in ACTIVITY_WEIGHTS) {
+                const inputId = `${ecId}-${activity}`;
+                const inputElement = document.getElementById(inputId);
+
+                if (inputElement) {
+                    let grade = parseFloat(inputElement.value) || 0;
+
+                    // Validación Vigesimal (0-20)
+                    if (grade < 0) {
+                        grade = 0;
+                        inputElement.value = 0;
+                    } else if (grade > 20) {
+                        grade = 20;
+                        inputElement.value = 20;
+                    }
+
+                    const weight = ACTIVITY_WEIGHTS[activity];
+                    ecNote += grade * weight;
+                    totalWeight += weight;
+                }
+            }
+            return totalWeight > 0 ? ecNote : 0;
+        }
+
+        /**
+         * Calcula y actualiza la nota final, aplicando redondeo especial y análisis.
+         */
+        function calculateFinalGrade() {
+            let finalGradeRaw = 0;
+            
+            // 1. Calcular la nota de cada EC y contribuir a la Nota Final
+            for (const ecId in EC_WEIGHTS) {
+                const ecNote = calculateECNote(ecId);
+                const ecWeight = EC_WEIGHTS[ecId];
+                
+                // Actualizar el display de la nota de la EC
+                const ecNoteDisplay = document.getElementById(`${ecId}-note`);
+                if (ecNoteDisplay) {
+                    ecNoteDisplay.textContent = ecNote.toFixed(2);
+                }
+
+                // Sumar la contribución ponderada a la nota final
+                finalGradeRaw += ecNote * ecWeight;
+            }
+
+            // 2. Aplicar la regla de redondeo especial
+            let finalGrade = finalGradeRaw;
+            if (finalGradeRaw > 12.50) {
+                // Redondear al entero superior si es > 12.50
+                finalGrade = Math.ceil(finalGradeRaw); 
+                // Asegurar que el redondeo no exceda 20
+                if (finalGrade > 20) finalGrade = 20;
+            }
+
+            // 3. Mostrar la Nota Final y el estado de aprobación
+            const finalGradeDisplay = document.getElementById('final-grade-display');
+            const passStatusDisplay = document.getElementById('pass-status');
+            const analysisTextDisplay = document.getElementById('analysis-text');
+            
+            finalGradeDisplay.textContent = finalGrade.toFixed(2);
+            passStatusDisplay.className = 'status-message'; 
+            analysisTextDisplay.className = 'analysis-text';
+            
+
+            // Determinación de Aprobado/Desaprobado
+            if (finalGrade >= PASSING_GRADE) {
+                passStatusDisplay.textContent = `¡APROBADO! 🎉 (Mínimo ${PASSING_GRADE})`;
+                passStatusDisplay.classList.add('status-aprobado');
+            } else {
+                passStatusDisplay.textContent = `DESAPROBADO 😔 (Mínimo ${PASSING_GRADE})`;
+                passStatusDisplay.classList.add('status-desaprobado');
+            }
+
+            // 4. Análisis de la Brecha
+            const gap = PASSING_GRADE - finalGrade;
+            
+            if (gap > 0) {
+                // Faltante para aprobar
+                analysisTextDisplay.innerHTML = `Te falta <span class="gap-value-desaprobado">${gap.toFixed(2)}</span> puntos para alcanzar la nota mínima de ${PASSING_GRADE}. ¡Sigue esforzándote! 💪`;
+            } else {
+                // Aprobado o con nota exacta
+                const surplus = finalGrade - PASSING_GRADE;
+                analysisTextDisplay.innerHTML = `¡Felicidades! Superaste el mínimo de ${PASSING_GRADE} por <span class="gap-value-aprobado">${surplus.toFixed(2)}</span> puntos. ¡Excelente trabajo! 🚀`;
+            }
+
+            // Adicional: Mostrar nota raw si se aplicó redondeo
+            if (finalGrade !== finalGradeRaw) {
+                 finalGradeDisplay.innerHTML += `<br><small style="font-size: 0.4em; font-weight: normal; opacity: 0.7;">(Nota real antes de redondeo: ${finalGradeRaw.toFixed(2)})</small>`;
+            }
+        }
+
+        // Inicializar el cálculo al cargar la página
+        document.addEventListener('DOMContentLoaded', calculateFinalGrade);
+    </script>
+</body>
+</html>
